@@ -29,87 +29,53 @@ An intelligent email management system that uses AI to analyze, classify, and su
 
 ## Prerequisites
 
-Before you begin, ensure you have the following:
+1. Node.js and npm installed
+2. OpenAI API key
+3. Google Cloud project with Gmail API enabled
 
-1. Node.js (v16 or higher)
-2. npm or yarn
-3. A Google Cloud Platform account
-4. An OpenAI API key
-
-## Installation
+## Setup
 
 1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/email-agent-cli.git
-cd email-agent-cli
-```
+   ```bash
+   git clone https://github.com/AveekGoyal/email-agent-cli.git
+   cd email-agent-cli
+   ```
 
 2. Install dependencies:
-```bash
-npm install
-```
+   ```bash
+   npm install
+   ```
 
 3. Create a `.env` file in the root directory:
-```env
-OPENAI_API_KEY=your_openai_api_key
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
-GOOGLE_REDIRECT_URI=your_redirect_uri
-```
+   ```env
+   OPENAI_API_KEY=your_openai_api_key
+   ```
 
-## Google Cloud Setup
-
-1. Go to the [Google Cloud Console](https://console.cloud.google.com)
-2. Create a new project or select an existing one
-3. Enable the Gmail API:
-   - Navigate to "APIs & Services" > "Library"
-   - Search for "Gmail API"
-   - Click "Enable"
-
-4. Create OAuth 2.0 credentials:
-   - Go to "APIs & Services" > "Credentials"
-   - Click "Create Credentials" > "OAuth client ID"
-   - Select "Desktop application" (since this is a CLI tool)
-   - Download the client credentials JSON file
-
-5. Configure OAuth consent screen:
-   - Go to "APIs & Services" > "OAuth consent screen"
-   - Select "External"
-   - Fill in the required information
-   - Add the following scopes:
-     - `https://www.googleapis.com/auth/gmail.readonly`
-     - `https://www.googleapis.com/auth/gmail.labels`
-
-## OpenAI API Setup
-
-1. Go to [OpenAI's website](https://platform.openai.com)
-2. Create an account or sign in
-3. Navigate to the API section
-4. Generate an API key
-5. Copy the key and add it to your `.env` file
+4. Set up Google Cloud OAuth:
+   - Go to the [Google Cloud Console](https://console.cloud.google.com)
+   - Create a new project or select an existing one
+   - Enable the Gmail API for your project
+   - Go to "Credentials" and create an OAuth 2.0 Client ID
+   - Download the client configuration file
+   - Save it as `credentials.json` in the project root directory
 
 ## Usage
 
 1. Start the application:
-```bash
-npm start
-```
+   ```bash
+   npm start
+   ```
 
-2. The application will:
-   - Prompt you to authenticate with Google in your browser
-   - After authentication, it will fetch your recent emails
-   - Analyze them using AI
-   - Generate analysis results in the `public` folder
+2. On first run:
+   - The app will open a browser window for Google OAuth authentication
+   - Select your Google account and grant the requested permissions
+   - The app will save the authentication token locally
 
-3. View the analysis results:
-   - Open `public/index.html` in your web browser
-   - The dashboard will show your emails categorized by priority
-   - Each email card contains:
-     - Read/Unread status
-     - Priority level
-     - Key points from the email
-     - Suggested action items
-     - Direct link to open in Gmail
+3. View your emails:
+   - Open `public/index.html` in your browser
+   - Click "Upload Results" to load your analyzed emails
+   - Use the time filters to organize emails by time of day
+   - View email details, priorities, and AI-generated summaries
 
 ## How It Works
 
@@ -214,21 +180,12 @@ If you encounter any issues:
 4. Check the console for error messages
 5. Ensure you have sufficient API credits (OpenAI)
 
-## Security Notes
+## Security
 
-- Never commit your `.env` file
-- Keep your API keys secure
-- Regularly rotate your credentials
-- Monitor your API usage
-- Review OAuth consent screen settings periodically
-
-## Support
-
-For support, please open an issue in the GitHub repository or contact the maintainers.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- Never commit your `.env` file or `credentials.json` to version control
+- The `.gitignore` file is configured to exclude sensitive files
+- OAuth tokens are stored locally and are not shared
+- Email data is processed locally on your machine
 
 ## Development
 
@@ -244,29 +201,10 @@ To modify styles:
 2. For custom styles, extend the theme in `tailwind.config.js`
 3. The dashboard uses Tailwind's JIT (Just-In-Time) compiler via CDN for development
 
-## Dashboard Features
+## License
 
-The dashboard (`public/index.html`) provides a modern interface with:
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-- **Email Management**
-  - Priority-based email cards with distinct visual indicators
-  - Read/Unread status badges
-  - Time-of-day filtering
+## Support
 
-- **Analysis Display**
-  - Key points extraction
-  - Action items identification
-  - Suggested responses
-  - Confidence scores
-
-- **UI Components**
-  - Responsive grid layout
-  - Interactive filter buttons
-  - File upload functionality
-  - Direct Gmail links
-
-- **Visual Hierarchy**
-  - Priority-based color coding
-  - Clear section organization
-  - Modern card design
-  - Responsive layout for all screen sizes
+For support, please open an issue in the GitHub repository or contact the maintainers.
