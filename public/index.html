@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-background min-h-screen p-6 md:p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-primary mb-4">Email Dashboard</h1>
+            <div class="relative inline-block">
+                <input type="file" 
+                       id="fileInput" 
+                       accept=".json" 
+                       class="hidden" 
+                       onchange="handleFileUpload(event)">
+                <button onclick="document.getElementById('fileInput').click()" 
+                        class="bg-black hover:bg-black/90 text-white px-6 py-3 rounded-lg font-semibold transition-all transform hover:-translate-y-0.5 active:translate-y-0 shadow-lg">
+                    Upload Results
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div id="totalEmails" class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow">
+                <div class="text-3xl font-bold text-primary mb-2">0</div>
+                <div class="text-gray-600 text-sm uppercase tracking-wide">Total Emails</div>
+            </div>
+            <div id="unreadEmails" class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow">
+                <div class="text-3xl font-bold text-primary mb-2">0</div>
+                <div class="text-gray-600 text-sm uppercase tracking-wide">Unread Emails</div>
+            </div>
+            <div id="urgentEmails" class="bg-white rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow">
+                <div class="text-3xl font-bold text-primary mb-2">0</div>
+                <div class="text-gray-600 text-sm uppercase tracking-wide">Urgent Emails</div>
+            </div>
+        </div>
+
+        <!-- Time Filter -->
+        <div class="flex flex-wrap justify-center gap-4 mb-12">
+            <button class="time-filter-btn active px-6 py-2 rounded-lg border-2 border-primary text-primary hover:bg-primary/10 transition-colors" data-time="all">All</button>
+            <button class="time-filter-btn px-6 py-2 rounded-lg border-2 border-primary text-primary hover:bg-primary/10 transition-colors" data-time="Morning">Morning</button>
+            <button class="time-filter-btn px-6 py-2 rounded-lg border-2 border-primary text-primary hover:bg-primary/10 transition-colors" data-time="Afternoon">Afternoon</button>
+            <button class="time-filter-btn px-6 py-2 rounded-lg border-2 border-primary text-primary hover:bg-primary/10 transition-colors" data-time="Evening">Evening</button>
+        </div>
+
+        <!-- Email List -->
+        <div id="emailList" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
+    </div>
+
+    <script>
+        let currentResults = [];
+        let currentTimeFilter = 'all';
+
+        function createEmailCard(email) {
+            const date = new Date(email.timestamp);
+            const formattedDate = date.toLocaleString();
+            
+            return `
+                <div class="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all relative flex flex-col gap-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="px-3 py-1 rounded-full text-sm ${email.isRead ? 'bg-gray-100 text-gray-600' : 'bg-primary/10 text-primary font-medium'}">
+                            ${email.isRead ? 'Read' : 'Unread'}
+                        </span>
+                        <span class="px-3 py-1 rounded-full text-sm font-semibold ${
+                            email.classification.priority === 'Urgent' ? 'bg-urgent/10 text-urgent' :
+                            email.classification.priority === 'Important' ? 'bg-important/10 text-important' :
+                            'bg-normal/10 text-normal'
+                        }">
+                            ${email.classification.priority}
+                        </span>
+                    </div>
+
+                    <div class="mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-2">${email.subject}</h3>
+                        <p class="text-gray-600 text-sm">${email.from}</p>
+                        <p class="text-gray-500 text-xs mt-1">${formattedDate}</p>
+                    </div>
+
+                    <div class="space-y-4 flex-grow">
+                        <div>
+                            <h4 class="text-primary font-medium mb-2">Key Points</h4>
+                            <ul class="list-disc list-inside space-y-1 text-sm text-gray-700">
+                                ${email.summary.keyPoints.map(point => `<li>${point}</li>`).join('')}
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 class="text-primary font-medium mb-2">Action Items</h4>
+                            <ul class="list-disc list-inside space-y-1 text-sm text-gray-700">
+                                ${email.summary.actionItems.map(item => `<li>${item}</li>`).join('')}
+                            </ul>
+                        </div>
+
+                        ${email.summary.suggestedResponse ? `
+                            <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-primary mt-4">
+                                <p class="text-sm text-gray-700">
+                                    <span class="font-medium">Suggested Response:</span> ${email.summary.suggestedResponse}
+                                </p>
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="mt-4 pt-4 border-t border-gray-100">
+                        <div class="flex justify-between text-xs text-gray-500 mb-3">
+                            <span>Classification: ${(email.classification.confidence * 100).toFixed(0)}%</span>
+                            <span>Summary: ${(email.summary.confidence * 100).toFixed(0)}%</span>
+                        </div>
+                        <a href="${email.emailLink}" target="_blank" 
+                           class="inline-flex items-center gap-2 text-primary hover:text-primary/80 font-medium text-sm transition-colors">
+                            Open in Gmail
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateStats(emails) {
+            document.getElementById('totalEmails').querySelector('div').textContent = emails.length;
+            document.getElementById('unreadEmails').querySelector('div').textContent = 
+                emails.filter(email => !email.isRead).length;
+            document.getElementById('urgentEmails').querySelector('div').textContent = 
+                emails.filter(email => email.classification.priority === 'Urgent').length;
+        }
+
+        function filterAndDisplayEmails() {
+            const emailList = document.getElementById('emailList');
+            emailList.innerHTML = '';
+
+            const filteredResults = currentTimeFilter === 'all' 
+                ? currentResults
+                : currentResults.filter(email => email.classification.timeOfDay === currentTimeFilter);
+
+            filteredResults.forEach(email => {
+                emailList.innerHTML += createEmailCard(email);
+            });
+
+            updateStats(filteredResults);
+        }
+
+        document.querySelectorAll('.time-filter-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                document.querySelectorAll('.time-filter-btn').forEach(btn => {
+                    btn.classList.remove('bg-primary/10', 'text-green-600');
+                });
+                button.classList.add('bg-primary/10', 'text-green-600');
+                currentTimeFilter = button.dataset.time;
+                filterAndDisplayEmails();
+            });
+        });
+
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            try {
+                const text = await file.text();
+                const results = JSON.parse(text);
+
+                if (!Array.isArray(results)) {
+                    throw new Error('Results must be an array');
+                }
+
+                // Sort by timestamp (newest first)
+                currentResults = results.sort((a, b) => {
+                    const dateA = new Date(b.timestamp || 0);
+                    const dateB = new Date(a.timestamp || 0);
+                    return dateA - dateB;
+                });
+
+                // Reset filter to 'all' and update UI
+                currentTimeFilter = 'all';
+                document.querySelectorAll('.time-filter-btn').forEach(btn => {
+                    btn.classList.remove('bg-primary/10', 'text-green-600');
+                    if (btn.dataset.time === 'all') {
+                        btn.classList.add('bg-primary/10', 'text-green-600');
+                    }
+                });
+
+                filterAndDisplayEmails();
+                
+                // Show success message
+                const header = document.querySelector('header');
+                const successMsg = document.createElement('div');
+                successMsg.className = 'mt-4 text-green-600 text-sm font-medium';
+                successMsg.textContent = `Successfully loaded ${results.length} emails`;
+                header.appendChild(successMsg);
+                
+                // Remove success message after 3 seconds
+                setTimeout(() => successMsg.remove(), 3000);
+            } catch (error) {
+                console.error('Error loading results:', error);
+                
+                // Show error message
+                const header = document.querySelector('header');
+                const errorMsg = document.createElement('div');
+                errorMsg.className = 'mt-4 text-red-600 text-sm font-medium';
+                errorMsg.textContent = 'Error loading file. Please make sure it\'s a valid JSON file.';
+                header.appendChild(errorMsg);
+                
+                // Remove error message after 3 seconds
+                setTimeout(() => errorMsg.remove(), 3000);
+            }
+            
+            // Reset file input
+            event.target.value = '';
+        }
+    </script>
+</body>
+</html>

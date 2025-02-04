@@ -1,0 +1,133 @@
+
+Email AI Agent
+An AI-powered email assistant that organizes Gmail into morning/afternoon/evening summaries, avoids duplicates via Supabase, flags urgent emails with NLP, and answers queries via a non-reply chatbot—keeping users focused without inbox overload.
+
+Core Features
+- Time-based email segmentation (morning/afternoon/evening summaries).
+- Gmail API integration for secure, real-time email fetching.
+- Duplicate prevention using Supabase to track processed emails.
+- Importance detection via keywords, NLP, and user-defined rules.
+- Summaries highlighting urgent emails requiring responses.
+- Memory system to track unresolved emails across summaries.
+- Customizable time slots for digest schedules.
+- Follow-up reminders for pending actions (24/48-hour nudges).
+- Secure authentication with Google OAuth and Supabase RLS.
+- Cross-platform notifications (email/WhatsApp) for summaries.
+
+Advanced Features
+- NLP-driven urgency detection (spaCy/Hugging Face).
+- One-click resolution (mark emails as "done" from the summary).
+- Recurring task tracking for long-term follow-ups.
+- Customizable templates for digest formatting (Markdown/HTML).
+- Time zone awareness for global users.
+- Encrypted email metadata storage in Supabase.
+- User feedback loop ("Not Important" flag to improve AI accuracy).
+- Batch processing to handle API rate limits.
+- Email Query Chatbot:
+- Natural language Q&A about processed emails (e.g., “Find invoices from Vendor X”).
+- Semantic search across email content using NLP embeddings.
+- Intent recognition to filter actionable vs. informational queries.
+- Link to source emails for context without direct replies.
+- Privacy-focused: Only accesses emails the user has already processed.
+
+Setup & Authentication
+User connects Gmail via OAuth.
+Saves preferences (time slots, priority senders) in Supabase.
+Initializes cron jobs for email checks.
+
+Email Fetching
+Cron triggers at end of each time slot (morning/afternoon/evening).
+Fetches new emails via Gmail API.
+Filters duplicates using Supabase processed_emails table.
+
+Email Processing
+Classification:
+LangChain classifies emails as "Urgent," "Important," or "Normal" using LLM.
+Summarization:
+LangChain generates concise summaries for each email.
+Embedding:
+Creates embeddings for chatbot search (stored in Supabase pgvector).
+Storage:
+Saves email metadata, summaries, and embeddings in Supabase.
+
+Summary Generation & Notification
+Queries Supabase for emails in the current time slot.
+Formats summary using LLM.
+Sends summary via email/WhatsApp.
+
+Chatbot Query Handling
+User submits query (e.g., "Find emails about Project X").
+LangChain RAG pipeline:
+Embeds query and retrieves relevant emails from Supabase.
+LLM synthesizes a natural language response.
+Displays response with links to source emails.
+
+Follow-Up & Memory
+Daily cron checks for unresolved urgent emails.
+Sends reminders for pending actions.
+Updates memory in Supabase based on user feedback (e.g., "Mark as Done").
+
+Example Workflow with Minimal Storage
+Fetch emails via Gmail API.
+Classify and summarize using LLM.
+Generate embeddings for chatbot search.
+Store only metadata, summaries, and embeddings in Supabase.
+Fetch raw email content from Gmail API only when needed (e.g., for chatbot responses).
+
+Here's a list of necessary frontend pages for the Email AI Agent:
+
+1. Authentication & Onboarding
+- Landing page with features overview and Google OAuth login
+- First-time setup wizard for configuring time slots and preferences
+- Account settings page for managing preferences and integrations
+
+2. Dashboard & Summaries
+- Main dashboard showing current time slot's email summary
+- Historical summaries view with filter/search capabilities
+- Individual email detail view with full context and actions
+- Calendar view showing email distribution and upcoming digests
+
+3. Email Management
+- Priority inbox showing urgent/important emails requiring action
+- Batch action interface for processing multiple emails
+- Custom rules configuration for email classification
+- Follow-up tracker for pending responses and reminders
+
+4. Chatbot Interface
+- Natural language query interface with conversation history
+- Search results page showing relevant email matches
+- Detailed email view accessed from search results
+- Saved queries/favorites for common searches
+
+5. Analytics & Insights
+- Email activity dashboard with graphs and trends
+- Response time analytics and productivity metrics
+- AI classification accuracy feedback interface
+- Priority sender statistics and patterns
+
+6. Settings & Configuration
+- Profile settings and notification preferences
+- Time slot configuration and timezone settings
+- Integration settings (WhatsApp, additional email accounts)
+- Security and privacy controls
+
+7. Help & Support
+- Getting started guide and tutorials
+- FAQ and troubleshooting page
+- Feature documentation and best practices
+- Support ticket/contact form
+
+8. Mobile-Specific Views
+- Mobile-optimized summary viewer
+- Quick actions interface for mobile users
+- Mobile notification center
+- Simplified chatbot interface for mobile
+
+This covers all core functionality while maintaining a clean, organized structure that prioritizes user experience and accessibility across devices.
+
+
+Use - npx shadcn@latest add "https://21st.dev/r/aceternity/sidebar" for sidebar after authentication. Change sidebar options like Dashboard, email summaries, chatbot, etc. but keep design intact. /Users/aveekgoyal/email-ai-agent/shape-landing-hero
+
+Use - npx shadcn@latest add "https://21st.dev/r/kokonutd/shape-landing-hero" for hero section on landing page. Keep design intact. Change required content and context. /Users/aveekgoyal/email-ai-agent/sidebar
+
+
