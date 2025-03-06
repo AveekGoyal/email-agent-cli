@@ -2,6 +2,7 @@
 import { ProcessedEmail } from './types';
 import { GmailService } from './services/gmail';
 import { EmailProcessingAgent } from './agents/emailAgent';
+import { UpworkAgent } from './agents/upworkAgent';
 import chalk from 'chalk';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -27,9 +28,11 @@ async function main() {
     await gmailService.initialize();
     
     const emailAgent = new EmailProcessingAgent();
+    const upworkAgent = new UpworkAgent();
     
-    console.log(chalk.cyan('🔍 Fetching and analyzing recent emails...\n'));
-    const emails = await gmailService.fetchRecentEmails(10);
+    console.log(chalk.cyan('🔍 Fetching recent emails...\n'));
+    // Fetch more emails to increase chances of finding Upwork emails
+    const emails = await gmailService.fetchRecentEmails(100);
     
     // Create the public directory if it doesn't exist
     const publicDir = path.join(__dirname, '..', 'public');
@@ -50,35 +53,28 @@ async function main() {
       }
     }
 
-    for (const email of emails) {
-      try {
-        const result = await emailAgent.processEmail(email);
-        
-        const priorityColor = getPriorityColor(result.classification.priority);
-        
-        // Add timestamp to the result
-        const resultWithTimestamp = {
-          ...result,
-          processedAt: new Date().toISOString()
-        };
-        
-        // Add to results array
-        allResults.push(resultWithTimestamp);
-        
-        // Save updated results array
-        fs.writeFileSync(outputPath, JSON.stringify(allResults, null, 2));
-        
-        // Console output
+    // Skip email processing and focus on Upwork analysis
+    console.log(chalk.cyan('\n🔍 Analyzing Upwork emails for portfolio project suggestions...\n'));
+    const portfolioSuggestions = await upworkAgent.generatePortfolioProjects(emails);
+    
+    if (portfolioSuggestions.length > 0) {
+      console.log(chalk.green('\n✨ Portfolio Project Suggestions:'));
+      portfolioSuggestions.forEach((project, index) => {
         console.log(chalk.white('\n' + '━'.repeat(80)));
-        console.log(chalk.blue(`📧 Processed: ${email.subject}`));
-        console.log(chalk.blue(`Priority: ${result.classification.priority}`));
-      } catch (error) {
-        console.error(chalk.red(`Error processing email: ${email.subject}`), error);
-      }
+        console.log(chalk.yellow(`Project ${index + 1}: ${project.projectTitle}`));
+        console.log(chalk.blue(`Description: ${project.projectDescription}`));
+        console.log(chalk.blue(`Skills: ${project.relevantSkills.join(', ')}`));
+        console.log(chalk.blue(`Difficulty: ${project.difficultyLevel}`));
+        console.log(chalk.blue(`Estimated Time: ${project.estimatedTimeToComplete}`));
+        console.log(chalk.blue(`Why Relevant: ${project.whyRelevant}`));
+      });
+    } else {
+      console.log(chalk.yellow('\n⚠️ No portfolio project suggestions generated. Try again later when you have more Upwork emails.'));
     }
     
+    console.log(chalk.green('\n✅ Analysis complete!'));
   } catch (error) {
-    console.error(chalk.red('Error in main:'), error);
+    console.error(chalk.red('\n❌ Error in main process:'), error);
   }
 }
 

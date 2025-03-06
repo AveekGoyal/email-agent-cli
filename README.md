@@ -1,6 +1,6 @@
 # Email Agent CLI
 
-An intelligent email management system that uses AI to analyze, classify, and summarize your emails, helping you prioritize and manage your inbox effectively.
+An intelligent email management system that uses AI to analyze, classify, and summarize your emails, helping you prioritize and manage your inbox effectively. It also includes a specialized feature for analyzing Upwork job emails and generating creative portfolio project ideas based on in-demand skills.
 
 ## Features
 
@@ -11,6 +11,21 @@ An intelligent email management system that uses AI to analyze, classify, and su
 - 💡 Suggested responses generation
 - 📊 Beautiful web-based dashboard for email visualization
 - 🎯 High accuracy confidence scoring
+- 🚀 Upwork job market analysis and portfolio project idea generation
+
+## Upwork Portfolio Project Generator
+
+This specialized feature analyzes your Upwork job notification emails to:
+
+1. **Identify In-Demand Skills**: Analyzes emails to determine which skills, technologies, and project types are most in demand
+2. **Discover Market Trends**: Identifies emerging trends and client preferences in the freelance marketplace
+3. **Generate Original Project Ideas**: Creates 15 unique portfolio project ideas that showcase the most in-demand skills
+4. **Exclude Unwanted Technologies**: Automatically filters out WordPress, PHP, and Laravel-related projects
+5. **Focus on Modern Tech**: Prioritizes projects using React, Next.js, Node.js, AI integration, and other modern technologies
+
+The analysis results are saved to:
+- `public/skill-demand-analysis.json`: Detailed breakdown of in-demand skills and technologies
+- `public/portfolio-suggestions.json`: 15 original portfolio project ideas with descriptions and relevance explanations
 
 ## Tech Stack
 
@@ -18,7 +33,7 @@ An intelligent email management system that uses AI to analyze, classify, and su
   - Node.js
   - TypeScript
   - Gmail API
-  - OpenAI GPT API
+  - Anthropic Claude 3.7 Sonnet API
   - LangChain
 
 - **Frontend**
@@ -30,7 +45,7 @@ An intelligent email management system that uses AI to analyze, classify, and su
 ## Prerequisites
 
 1. Node.js and npm installed
-2. OpenAI API key
+2. Claude API key
 3. Google Cloud project with Gmail API enabled
 
 ## Setup
@@ -48,47 +63,55 @@ An intelligent email management system that uses AI to analyze, classify, and su
 
 3. Create a `.env` file in the root directory:
    ```env
-   OPENAI_API_KEY=your_openai_api_key
+   CLAUDE_API_KEY=your_claude_api_key
    ```
 
-4. Set up Google Cloud OAuth:
-   - Go to the [Google Cloud Console](https://console.cloud.google.com)
-   - Create a new project or select an existing one
-   - Enable the Gmail API for your project
-   - Go to "Credentials" and create an OAuth 2.0 Client ID
-   - Download the client configuration file
-   - Save it as `credentials.json` in the project root directory
+4. Set up Google OAuth credentials:
+   - Create a project in Google Cloud Console
+   - Enable the Gmail API
+   - Create OAuth credentials
+   - Download the credentials and save as `credentials.json` in the project root
 
 ## Usage
 
-1. Start the application:
+1. Run the application:
    ```bash
    npm start
    ```
 
-2. On first run:
-   - The app will open a browser window for Google OAuth authentication
-   - Select your Google account and grant the requested permissions
-   - The app will save the authentication token locally
+2. The application will:
+   - Fetch your recent emails from Gmail
+   - Analyze and classify each email
+   - Generate summaries and action items
+   - Save the results to `public/analysis-results.json`
+   - Analyze Upwork emails from March 4-6, 2025
+   - Generate skill demand analysis and portfolio project ideas
+   - Save results to `public/skill-demand-analysis.json` and `public/portfolio-suggestions.json`
 
-3. View your emails:
-   - Open `public/index.html` in your browser
-   - Click "Upload Results" to load your analyzed emails
-   - Use the time filters to organize emails by time of day
-   - View email details, priorities, and AI-generated summaries
+3. View the results:
+   - Open `public/index.html` in your browser to see the email analysis dashboard
+   - Check `public/portfolio-suggestions.json` for Upwork portfolio project ideas
+   - Examine `public/skill-demand-analysis.json` for detailed skill demand insights
 
 ## How It Works
 
 1. **Email Fetching**: The application uses Gmail API to fetch your recent emails
-2. **AI Analysis**: Each email is analyzed using OpenAI's GPT model to:
+2. **AI Analysis**: Each email is analyzed using Anthropic Claude API to:
    - Determine priority
    - Extract key points
    - Identify action items
    - Generate suggested responses
-3. **Results Generation**: 
-   - Analysis results are saved to `public/analysis-results.json`
-   - A static dashboard (`public/index.html`) displays the results
-   - No server is required - just open the HTML file in your browser
+3. **Upwork Analysis**: A two-step process for analyzing Upwork emails:
+   - **Step 1: Skill Demand Analysis**
+     - Identifies the most in-demand technologies, skills, and categories
+     - Discovers emerging trends and client insights
+     - Assigns demand scores to each skill and technology
+   - **Step 2: Portfolio Project Generation**
+     - Uses the skill demand analysis to generate original project ideas
+     - Creates detailed project descriptions with relevant skills
+     - Ensures projects showcase the most in-demand skills
+4. **Result Storage**: All analysis results are stored as JSON files for easy access
+5. **Visualization**: A simple web interface displays your analyzed emails and portfolio suggestions
 
 ## Project Structure
 
@@ -100,111 +123,47 @@ The project is organized into several key directories and files:
 - `index.ts`: Entry point of the application. Handles the main execution flow and CLI interface.
 
 #### Agents
-- `agents/emailAgent.ts`: Core email processing agent that orchestrates the analysis workflow:
-  - Manages the AI model configuration
-  - Coordinates between different analysis tools
-  - Handles confidence thresholds and result validation
-  - Implements retry and improvement logic for low-confidence results
-
-#### Services
-- `services/gmail.ts`: Gmail API integration service:
-  - Handles Gmail authentication
-  - Fetches emails and their metadata
-  - Manages API scopes and permissions
-  - Provides methods for email operations
+- `agents/emailAgent.ts`: Core email processing agent that orchestrates the analysis workflow
+- `agents/upworkAgent.ts`: Specialized agent for analyzing Upwork emails and generating portfolio project ideas
 
 #### Tools
-- `tools/emailTools.ts`: Collection of AI-powered email analysis tools:
-  - Email classification tool (priority determination)
-  - Email summarization tool (key points extraction)
-  - Analysis evaluation tool (quality checking)
-  - Analysis improvement tool (refinement of results)
+- `tools/emailTools.ts`: Collection of tools for email analysis, classification, and summarization
+- `tools/upworkTools.ts`: Tools for analyzing Upwork emails, identifying skill demand, and generating portfolio project ideas
 
-#### Types and Interfaces
-- `types/index.ts`: TypeScript type definitions:
-  - Email data structures
-  - Classification results
-  - Summary formats
-  - API response types
+#### Services
+- `services/gmailService.ts`: Handles Gmail API integration and email fetching
+- `services/fileService.ts`: Manages file operations for storing analysis results
 
-### Public Assets (`public/`)
-- `index.html`: Static dashboard for visualizing email analysis:
-  - Priority-based email cards
-  - Filtering and sorting capabilities
-  - Interactive UI elements
-- `analysis-results.json`: Generated file containing processed email data
+#### Configuration
+- `config.ts`: Central configuration for API keys, model settings, and application parameters
 
-### Configuration
-- `.env`: Environment configuration file:
-  - API keys
-  - Authentication credentials
-  - Service configurations
-
-### Documentation
-- `README.md`: Project documentation
-- `LICENSE`: MIT license file
-
-## File Relationships
-
-1. The process starts in `index.ts`, which initializes the email agent
-2. `emailAgent.ts` uses the Gmail service to fetch emails and coordinates the analysis
-3. `gmail.ts` handles all Gmail API interactions
-4. `emailTools.ts` provides the AI-powered analysis capabilities
-5. Results are saved to `analysis-results.json`
-6. The dashboard in `index.html` reads and displays the results
+### Output (`public/`)
+- `index.html`: Web dashboard for visualizing email analysis results
+- `analysis-results.json`: Structured data from email analysis
+- `skill-demand-analysis.json`: Analysis of in-demand skills from Upwork emails
+- `portfolio-suggestions.json`: Generated portfolio project ideas
 
 ## Dashboard Features
 
-- **Priority Filtering**: Filter emails by Urgent, Important, or Normal priority
-- **Read/Unread Status**: Quickly identify unread emails
-- **Direct Gmail Links**: Open any email directly in Gmail
+The web dashboard provides a visual interface to:
+
+- **Email Overview**: See all analyzed emails at a glance
+- **Priority Filtering**: Filter emails by priority level
 - **Action Items**: View suggested actions for each email
 - **Smart Summaries**: Get AI-generated summaries of email content
 - **Confidence Scores**: See the AI's confidence in its analysis
+- **Portfolio Projects**: Browse suggested portfolio project ideas
 
 ## Contributing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## Error Handling
-
-If you encounter any issues:
-
-1. Check your API keys and credentials
-2. Ensure all required scopes are enabled in Google Cloud Console
-3. Verify your `.env` file contains all required variables
-4. Check the console for error messages
-5. Ensure you have sufficient API credits (OpenAI)
-
-## Security
-
-- Never commit your `.env` file or `credentials.json` to version control
-- The `.gitignore` file is configured to exclude sensitive files
-- OAuth tokens are stored locally and are not shared
-- Email data is processed locally on your machine
-
-## Development
-
-The project uses Tailwind CSS for styling. The following files are important for frontend development:
-
-- `public/index.html`: Main dashboard interface
-- `public/styles.css`: Tailwind CSS imports
-- `tailwind.config.js`: Tailwind configuration
-- `postcss.config.js`: PostCSS configuration
-
-To modify styles:
-1. Use Tailwind utility classes directly in HTML
-2. For custom styles, extend the theme in `tailwind.config.js`
-3. The dashboard uses Tailwind's JIT (Just-In-Time) compiler via CDN for development
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Support
+## Acknowledgements
 
-For support, please open an issue in the GitHub repository or contact the maintainers.
+- [Anthropic Claude](https://www.anthropic.com/claude) for providing the AI capabilities
+- [LangChain](https://js.langchain.com/) for the AI framework
+- [Gmail API](https://developers.google.com/gmail/api) for email access

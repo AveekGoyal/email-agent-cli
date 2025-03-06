@@ -1,5 +1,5 @@
 // agents/emailAgent.ts
-import { ChatOpenAI } from "@langchain/openai";
+import { ChatAnthropic } from "@langchain/anthropic";
 import { 
   classifyEmailTool, 
   summarizeEmailTool, 
@@ -10,15 +10,15 @@ import { config } from '../config';
 import { EmailInput, ProcessedEmail } from '../types';
 
 export class EmailProcessingAgent {
-  private model: ChatOpenAI;
+  private model: ChatAnthropic;
   private tools: any[];
   private CONFIDENCE_THRESHOLD = 0.8;
 
   constructor() {
-    this.model = new ChatOpenAI({
-      modelName: "gpt-4o-mini",
+    this.model = new ChatAnthropic({
+      modelName: "claude-3-5-haiku-20241022",
       temperature: 0,
-      openAIApiKey: config.openAiApiKey,
+      anthropicApiKey: config.claudeApiKey,
     });
     
     this.tools = [
@@ -43,8 +43,6 @@ export class EmailProcessingAgent {
   }
 
   async processEmail(email: EmailInput): Promise<ProcessedEmail> {
-    const modelWithTools = this.model.bindTools(this.tools);
-
     try {
       console.log('\n📝 Starting email analysis...');
       console.log('Email details:', {

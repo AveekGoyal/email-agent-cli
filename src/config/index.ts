@@ -7,7 +7,7 @@ dotenv.config();
 
 // Define environment variables schema
 const envSchema = z.object({
-  OPENAI_API_KEY: z.string().min(1, "OpenAI API Key is required"),
+  CLAUDE_API_KEY: z.string().min(1, "Claude API Key is required"),
 });
 
 // Validate environment variables
@@ -24,5 +24,5 @@ try {
 
 // Export validated environment variables
 export const config = {
-  openAiApiKey: process.env.OPENAI_API_KEY,
+  claudeApiKey: process.env.CLAUDE_API_KEY,
 } as const;

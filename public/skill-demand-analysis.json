@@ -1,0 +1,125 @@
+{
+  "generatedAt": "2025-03-06T08:39:25.921Z",
+  "analysis": {
+    "topTechnologies": [
+      {
+        "name": "AI",
+        "demandScore": 10
+      },
+      {
+        "name": "React.js",
+        "demandScore": 8
+      },
+      {
+        "name": "Next.js",
+        "demandScore": 7
+      },
+      {
+        "name": "Node.js",
+        "demandScore": 6
+      },
+      {
+        "name": "JavaScript",
+        "demandScore": 5
+      },
+      {
+        "name": "Elementor",
+        "demandScore": 4
+      },
+      {
+        "name": "Shopify",
+        "demandScore": 3
+      },
+      {
+        "name": "HTML5",
+        "demandScore": 3
+      },
+      {
+        "name": "Divi",
+        "demandScore": 2
+      },
+      {
+        "name": "Vercel",
+        "demandScore": 2
+      }
+    ],
+    "topCategories": [
+      {
+        "category": "AI Development",
+        "demandScore": 10
+      },
+      {
+        "category": "Frontend Development",
+        "demandScore": 8
+      },
+      {
+        "category": "Full-Stack Development",
+        "demandScore": 7
+      },
+      {
+        "category": "Website Development",
+        "demandScore": 6
+      },
+      {
+        "category": "E-commerce Development",
+        "demandScore": 5
+      }
+    ],
+    "topSkills": [
+      {
+        "skill": "AI Integration",
+        "demandScore": 10
+      },
+      {
+        "skill": "Responsive Web Design",
+        "demandScore": 8
+      },
+      {
+        "skill": "API Integration",
+        "demandScore": 7
+      },
+      {
+        "skill": "UI/UX Design",
+        "demandScore": 6
+      },
+      {
+        "skill": "Chatbot Development",
+        "demandScore": 6
+      },
+      {
+        "skill": "Payment Gateway Integration",
+        "demandScore": 5
+      },
+      {
+        "skill": "Landing Page Development",
+        "demandScore": 5
+      },
+      {
+        "skill": "Progressive Web App Development",
+        "demandScore": 4
+      },
+      {
+        "skill": "Deployment & Hosting",
+        "demandScore": 3
+      },
+      {
+        "skill": "Geolocation Integration",
+        "demandScore": 2
+      }
+    ],
+    "emergingTrends": [
+      "AI agent development for task automation and business workflows",
+      "Voice AI and conversational interfaces for customer service",
+      "Integration of AI with traditional web applications",
+      "Demand for geo-location based services in web applications",
+      "Progressive Web Apps (PWAs) gaining traction over traditional websites"
+    ],
+    "insights": [
+      "Clients are increasingly seeking AI expertise to automate business processes and enhance customer interactions",
+      "There's high demand for developers who can integrate multiple technologies rather than specialists in a single area",
+      "Businesses are prioritizing responsive, mobile-friendly designs across all web projects",
+      "Quick turnaround times are frequently mentioned, suggesting urgency is a key client priority",
+      "Clients are looking for developers who understand business objectives, not just technical implementation"
+    ]
+  }
+}
